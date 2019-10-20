@@ -33,10 +33,12 @@ function getBoard(id) {
     .then(function(data) {
       board = data
       renderBoard();
-  })
-    .catch(function(err) {
-      location.replace('/boards');  
-  });
+    })
+      .catch(function(err) {
+      if (err.statusText === 'Unauthorized') {
+        location.replace('/boards');
+      }
+    });
 }
 
 function handleLogout() {
@@ -117,19 +119,19 @@ function renderBoard() {
 
 function renderContributors() {
   let $contributorListItems = board.users.map(function(user) {
-    let $contributorListItem = $('<li>').text(user.email);
+    let $contributorListItem = $('<li>');
+    let $contributorSpan = $('<span>').text(user.email);
+    let $contributorDeleteButton = $('<button class="danger">Remove</button>')
+      .data(user)
+      .on('click', handleContributorDelete);
+
+    $contributorListItem.append($contributorSpan, $contributorDeleteButton);
+
     return $contributorListItem;
   });
 
   $contributorModalList.empty();
   $contributorModalList.append($contributorListItems);
-}
-
-function openContributorModal() {
-  $contributorModalInput.val('');
-  displayMessage('');
-
-  MicroModal.show('contribute');
 }
 
 function makeSortable() {
@@ -409,6 +411,31 @@ function handleContributorSave(event) {
       );
     });
 }
+
+function openContributorModal() {
+  $contributorModalInput.val('');
+  displayMessage('');
+
+  MicroModal.show('contribute');
+}
+
+function handleContributorDelete(event) {
+  let { id, email } = $(event.target).data();
+
+  $.ajax({
+    url: '/api/user_boards',
+    method: 'DELETE',
+    data: {
+      user_id: id,
+      board_id: board.id
+    }
+  }).then(function() {
+    init();
+    displayMessage(`Successfully removed user: ${email}`, 'success');
+  });
+}
+
+
 
 $saveCardButton.on('click', handleCardCreate);
 $saveListButton.on('click', handleListCreate);
