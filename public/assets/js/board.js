@@ -125,6 +125,13 @@ function renderContributors() {
   $contributorModalList.append($contributorListItems);
 }
 
+function openContributorModal() {
+  $contributorModalInput.val('');
+  displayMessage('');
+
+  MicroModal.show('contribute');
+}
+
 function makeSortable() {
   Sortable.create($boardContainer[0], {
     animation: 150,
@@ -403,9 +410,6 @@ function handleContributorSave(event) {
     });
 }
 
-
-$contributorModalSaveButton.on('click', handleContributorSave);
-$contributorModalButton.on('click', openContributorModal);
 $saveCardButton.on('click', handleCardCreate);
 $saveListButton.on('click', handleListCreate);
 $logoutButton.on('click', handleLogout);
@@ -413,3 +417,5 @@ $editListSaveButton.on('click', handleListEdit);
 $editListDeleteButton.on('click', handleListDelete);
 $editCardSaveButton.on('click', handleCardSave);
 $editCardDeleteButton.on('click', handleCardDelete);
+$contributorModalButton.on('click', openContributorModal);
+$contributorModalSaveButton.on('click', handleContributorSave);
